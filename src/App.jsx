@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import md5 from 'md5';
 import './App.scss';
 import _jobs from './data/jobs.json';
 import { JobsFull } from './components/JobsFull';
@@ -16,6 +17,10 @@ function App() {
 	const [displayKind, setDisplayKind] = useState('');
 	const [jobs, setJobs] = useState([]);
 	const [techItems, setTechItems] = useState([]);
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [formLogin, setFormLogin] = useState('');
+	const [formPassword, setFormPassword] = useState('');
+	const [isFalseAttempt, setIsFalseAttempt] = useState(false);
 
 	const saveToLocalStorage = () => {
 		if (displayKind !== '') {
@@ -44,7 +49,7 @@ function App() {
 			const data = await response.json();
 			setTechItems(data);
 		})();
-	}
+	};
 
 	useEffect(() => {
 		loadLocalStorage();
@@ -70,15 +75,75 @@ function App() {
 		setJobs([...jobs]);
 	};
 
+	const handleSubmitButton = (e) => {
+		e.preventDefault();
+		if (
+			formLogin === 'hophop' &&
+			md5(formPassword) === '202cb962ac59075b964b07152d234b70'
+		) {
+			setIsLoggedIn(true);
+			setIsFalseAttempt(false);
+		} else {
+			setIsFalseAttempt(true);
+		}
+	};
+
 	return (
 		<div className="App">
 			<h1>Job Application Process</h1>
-			<div>There are {techItems.length} tech items.</div>
-			<button onClick={handleToggleView}>Toggle View</button>
-			{displayKind === 'full' ? (
-				<JobsFull jobs={jobs} handleStatusChange={handleStatusChange} techItems={techItems} />
+			{isLoggedIn ? (
+				<>
+					<div>There are {techItems.length} tech items.</div>
+					<button onClick={handleToggleView}>Toggle View</button>
+					{displayKind === 'full' ? (
+						<JobsFull
+							jobs={jobs}
+							handleStatusChange={handleStatusChange}
+							techItems={techItems}
+						/>
+					) : (
+						<JobsList jobs={jobs} />
+					)}
+				</>
 			) : (
-				<JobsList jobs={jobs} />
+				<>
+					<form>
+						<fieldset>
+							<legend>Login</legend>
+							<div className="messageOnForm">
+								{isFalseAttempt && 'Please try again'}
+							</div>
+							<div className="row">
+								<label htmlFor="login">Login</label>
+								<input
+									autoFocus
+									type="text"
+									id="login"
+									value={formLogin}
+									onChange={(e) => {
+										setFormLogin(e.target.value);
+									}}
+								/>
+							</div>
+							<div className="row">
+								<label htmlFor="password">Password</label>
+								<input
+									type="password"
+									id="password"
+									value={formPassword}
+									onChange={(e) => {
+										setFormPassword(e.target.value);
+									}}
+								/>
+							</div>
+							<div className="buttonRow">
+								<button onClick={handleSubmitButton}>
+									Enter
+								</button>
+							</div>
+						</fieldset>
+					</form>
+				</>
 			)}
 		</div>
 	);
