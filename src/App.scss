@@ -5,7 +5,10 @@ body {
 	.App {
 		font-size: 1.5rem;
 		color: #ccc;
-
+.buttonArea {
+	display: flex;
+	justify-content:space-between;
+}
 		form{
 			width:600px;
 

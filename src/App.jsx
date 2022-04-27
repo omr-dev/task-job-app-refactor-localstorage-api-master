@@ -21,6 +21,7 @@ function App() {
 	const [formLogin, setFormLogin] = useState('');
 	const [formPassword, setFormPassword] = useState('');
 	const [isFalseAttempt, setIsFalseAttempt] = useState(false);
+	const [userGroup, setUserGroup] = useState('');
 
 	const saveToLocalStorage = () => {
 		if (displayKind !== '') {
@@ -78,14 +79,27 @@ function App() {
 	const handleSubmitButton = (e) => {
 		e.preventDefault();
 		if (
-			formLogin === 'hophop' &&
+			formLogin === 'me' &&
 			md5(formPassword) === '202cb962ac59075b964b07152d234b70'
+		) {
+			setUserGroup('fullAccessMembers');
+			setIsLoggedIn(true);
+			setIsFalseAttempt(false);
+		} else if (
+			formLogin === 'guest' &&
+			md5(formPassword) === '900150983cd24fb0d6963f7d28e17f72'
 		) {
 			setIsLoggedIn(true);
 			setIsFalseAttempt(false);
 		} else {
 			setIsFalseAttempt(true);
 		}
+	};
+	const handleLogoutButton = () => {
+		setFormLogin('');
+		setFormPassword('');
+		setIsLoggedIn(false);
+		setUserGroup('');
 	};
 
 	return (
@@ -94,7 +108,15 @@ function App() {
 			{isLoggedIn ? (
 				<>
 					<div>There are {techItems.length} tech items.</div>
-					<button onClick={handleToggleView}>Toggle View</button>
+					<div className="buttonArea">
+						{userGroup === 'fullAccessMembers' && (
+							<button onClick={handleToggleView}>
+								Toggle View
+							</button>
+						)}
+
+						<button onClick={handleLogoutButton}>Log out</button>
+					</div>
 					{displayKind === 'full' ? (
 						<JobsFull
 							jobs={jobs}
